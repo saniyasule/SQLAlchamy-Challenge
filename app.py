@@ -78,7 +78,7 @@ def stations():
 def temperature_tobs():
     results = session.query(Station.name, Measurement.date, Measurement.tobs).\
         filter(Measurement.date >= "2017-01-01", Measurement.date <= "2018-01-01").\
-        all()
+        filter(Measurement.station == 'USC00519281').all()
 
     #use dictionary, create json
     tobs_list = []
@@ -93,20 +93,21 @@ def temperature_tobs():
 
 
 @app.route("/api/v1.0/<start>")
-def start(start=None):
-    
+def start(start):
+    #start = "2017-08-01"
     from_start = session.query(Measurement.date, func.min(Measurement.tobs), func.avg(Measurement.tobs),
-                               func.max(Measurement.tobs)).filter(Measurement.date >= start).group_by(
-        Measurement.date).all()
+    func.max(Measurement.tobs)).filter(Measurement.date >= start).group_by(Measurement.date).all()
     from_start_list = list(from_start)
     return jsonify(from_start_list)
 
 
 @app.route("/api/v1.0/<start>/<end>")
-def start_end(start=None, end=None):
+def start_end(start , end ):
+    #start = "2017-08-01"
+    #end = "2017-08-23"
     between_dates = session.query(Measurement.date, func.min(Measurement.tobs), func.avg(Measurement.tobs),
-                                  func.max(Measurement.tobs)).filter(Measurement.date >= start).filter(
-        Measurement.date <= end).group_by(Measurement.date).all()
+    func.max(Measurement.tobs)).filter(Measurement.date >= start).filter(
+    Measurement.date <= end).group_by(Measurement.date).all()
     between_dates_list = list(between_dates)
     return jsonify(between_dates_list)
 
